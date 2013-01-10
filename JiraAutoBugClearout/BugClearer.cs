@@ -90,8 +90,10 @@ namespace JiraAutoBugClearout
                 cmd.CommandText = @"DELETE FROM jiraaction WHERE id IN (SELECT TOP (@commentsToDelete) id FROM jiraaction WHERE
                     issueid=@issueid AND
                     author=@bloatauthor AND
+                    actiontype='comment' AND
                     actionbody NOT LIKE '%Email%' AND
-                    actionbody NOT LIKE '%UserDescription%'
+                    actionbody NOT LIKE '%UserDescription%' AND
+                    actionbody LIKE '%Url%'
                     ORDER BY id
                     )";
                 cmd.Parameters.AddWithValue("@commentsToDelete", commentsToDelete);
@@ -110,10 +112,12 @@ namespace JiraAutoBugClearout
                 {
                     cmd.CommandTimeout = 0;
                     int commentsToDelete = firstPassCommentsRemaining - BloatCommentThreshold;
-                    cmd.CommandText = @"DELETE TOP (" + commentsToDelete + @") FROM jiraaction WHERE id IN (SELECT TOP (@commentsToDelete) id FROM jiraaction WHERE
+                    cmd.CommandText = @"DELETE FROM jiraaction WHERE id IN (SELECT TOP (@commentsToDelete) id FROM jiraaction WHERE
                     issueid=@issueid AND
                     author=@bloatauthor AND
-                    actionbody NOT LIKE '%UserDescription%'
+                    actiontype='comment' AND
+                    actionbody NOT LIKE '%UserDescription%' AND
+                    actionbody LIKE '%Url%'
                     ORDER BY id
                     )";
                     cmd.Parameters.AddWithValue("@commentsToDelete", commentsToDelete);
